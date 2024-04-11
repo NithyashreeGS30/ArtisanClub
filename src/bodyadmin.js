@@ -67,7 +67,7 @@ const BodyPage1 = () => {
   const addProduct = () => {
     setProducts([...products, { ...newProduct, id: products.length + 1 }]);
     setIsAddProductFormOpen(false);
-    setNewProduct({ name: '', price: '', imageUrl: '' });
+    setNewProduct({ Art_ID:' ',name: '', price: '', imageUrl: '' });
   };
 
   const deleteProduct = (productId) => {
@@ -110,6 +110,7 @@ const BodyPage1 = () => {
                 <span className="add-product-modal-close" onClick={() => setIsAddProductFormOpen(false)}>&times;</span>
                 <h2>Add Product</h2>
                 <form onSubmit={addProduct}>
+                <input type="text" value={newProduct.Art_ID} onChange={(e) => setNewProduct({ ...newProduct, Art_ID: e.target.value })} placeholder="Artist ID" required />
                   <input type="text" value={newProduct.name} onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })} placeholder="Product Name" required />
                   <input type="text" value={newProduct.price} onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })} placeholder="Price" required />
                   <input type="text" value={newProduct.imageUrl} onChange={(e) => setNewProduct({ ...newProduct, imageUrl: e.target.value })} placeholder="Image URL" required />

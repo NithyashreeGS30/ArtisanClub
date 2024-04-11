@@ -1,10 +1,12 @@
-
-
 import React from 'react';
 import './Header.css';
 import logo from '../logo1.png';
 
-const Header = ({ headName, cartCount, toggleCart }) => { // Pass toggleCart function as prop
+const Header = ({ headName, cartCount, toggleCart }) => {
+  // Define sample categories and artists for demonstration
+  const categories = ['Category 1', 'Category 2', 'Category 3'];
+  const artists = ['Artist 1', 'Artist 2', 'Artist 3'];
+
   return (
     <div className="header">
       <img
@@ -13,9 +15,22 @@ const Header = ({ headName, cartCount, toggleCart }) => { // Pass toggleCart fun
         alt="Logo"
       />
 
-      <div className="header__search">
-        <input type="text" className="header__searchInput" />
-        <button className="header__searchButton">Search</button>
+      <div className="header__dropdowns">
+        {/* Dropdown for categories */}
+        <select className="header__dropdown">
+          <option value="">Select Category</option>
+          {categories.map((category, index) => (
+            <option key={index} value={category}>{category}</option>
+          ))}
+        </select>
+
+        {/* Dropdown for artists */}
+        <select className="header__dropdown">
+          <option value="">Select Artist</option>
+          {artists.map((artist, index) => (
+            <option key={index} value={artist}>{artist}</option>
+          ))}
+        </select>
       </div>
 
       <div className="header__nav">
