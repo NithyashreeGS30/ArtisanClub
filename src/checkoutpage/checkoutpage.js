@@ -6,10 +6,21 @@ const CheckoutPage = ({ cartItems }) => {
     return <div className="checkout-page empty-cart">No items in cart</div>;
   }
 
+  // Group cart items by name and calculate total quantity
+  const groupedItems = cartItems.reduce((acc, item) => {
+    const existingItem = acc.find(group => group.name === item.Artist);
+    if (existingItem) {
+      existingItem.quantity += item.quantity;
+    } else {
+      acc.push({ ...item });
+    }
+    return acc;
+  }, []);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission here
     console.log(cartItems); // Cart items information
+    // Handle form submission here
   };
 
   return (
@@ -17,16 +28,22 @@ const CheckoutPage = ({ cartItems }) => {
       <h2 className="checkout-title">Checkout</h2>
       <form className="checkout-form" onSubmit={handleSubmit}>
         <div className="cart-items">
-          {cartItems.map(item => (
-            <div key={item.id} className="cart-item">
-              <img className="item-image" src={item.imageUrl} alt={item.name} />
-              <div className="item-details">
-                <div className="item-name">{item.name}</div>
-                <div className="item-price">{item.price}</div>
-                <div className="item-quantity">Quantity: {item.quantity}</div>
-              </div>
-            </div>
-          ))}
+        {groupedItems.map((item) => (
+  <div key={item.id} className="cart-item">
+                  <img
+                src={item.ArtImages}
+                alt={item.Artist}
+                className="product-image"
+                style={{ width: '200px', height: '200px' }}
+              />
+    <div className="item-details">
+      <div className="item-name">{item.Artist}</div>
+      <div className="item-price">{item.Price}</div>
+      <div className="item-quantity">Quantity: {item.quantity}</div>
+    </div>
+  </div>
+))}
+
         </div>
         <div className="shipping-details">
           <h3 className="shipping-title">Shipping Information</h3>

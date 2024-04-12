@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './BodyPage.css';
 import Header from './header/header';
 import CheckoutPage from './checkoutpage/checkoutpage'; 
@@ -6,55 +6,117 @@ import CheckoutPage from './checkoutpage/checkoutpage';
 const BodyPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false); // State to track whether the cart is open
+  const [selectedCategory, setSelectedCategory] = useState(''); // State to hold the selected category
+  const [selectedArtist, setSelectedArtist] = useState(''); // State to hold the selected artist
+  const [products, setProducts] = useState([]); // State to hold fetched products
+  const [showCondition, setShowCondition] = useState(null); // State to track the visibility of condition information
+
+  useEffect(() => {
+    // Fetch products when selected category changes
+    if (selectedCategory) {
+      fetchProducts(selectedCategory);
+    }
+  }, [selectedCategory]);
+
+  const fetchProducts = async (category) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/search_by_category?category=${category}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+      const data = await response.json();
+      // Convert products.artworks into an array using Object.values()
+      const artworksArray = Object.values(data.artworks);
+      setProducts(artworksArray);
+    } catch (error) {
+      console.error('Error fetching products:', error.message);
+    }
+  };
+
+  // Function to handle category change
+  const handleCategoryChange = (category) => {
+    setSelectedCategory(category);
+  };
+
+  // Function to handle artist change
+  const handleArtistChange = async (artist) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/search_by_artist?artist=${artist}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+      const data = await response.json();
+      // Convert products.artworks into an array using Object.values()
+      const artworksArray = Object.values(data.artworks);
+      setProducts(artworksArray);
+    } catch (error) {
+      console.error('Error fetching products:', error.message);
+    }
+  };
 
   const addToCart = (product) => {
-    const existingItemIndex = cartItems.findIndex(item => item.id === product.id);
+    const existingItem = cartItems.find((item) => item._id === product._id);
   
-    if (existingItemIndex !== -1) {
-      const updatedCartItems = cartItems.map((item, index) => {
-        if (index === existingItemIndex) {
-          return { ...item, quantity: item.quantity + 1 };
-        }
-        return item;
-      });
-  
+    if (existingItem) {
+      // If the item already exists in the cart, update its quantity
+      const updatedCartItems = cartItems.map((item) =>
+        item._id === product._id ? { ...item, quantity: item.quantity + 1 } : item
+      );
       setCartItems(updatedCartItems);
     } else {
+      // If the item is not in the cart, add it with quantity 1
       setCartItems([...cartItems, { ...product, quantity: 1 }]);
     }
   };
+  
+  
 
   const toggleCart = () => {
     setIsCartOpen(prevState => !prevState); // Toggle the state variable
   };
 
-  const products = [
-    { id: 1, name: 'Product 1', price: '$10', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 2, name: 'Product 2', price: '$20', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 3, name: 'Product 3', price: '$30', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 4, name: 'Product 4', price: '$40', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 5, name: 'Product 5', price: '$50', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 6, name: 'Product 6', price: '$60', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 7, name: 'Product 7', price: '$70', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 8, name: 'Product 8', price: '$80', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 9, name: 'Product 9', price: '$90', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 10, name: 'Product 10', price: '$100', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 11, name: 'Product 10', price: '$100', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 12, name: 'Product 10', price: '$100', imageUrl: 'https://via.placeholder.com/150' },
-  ];
+  // Function to handle click on product image
+  const handleImageClick = (productId) => {
+    setShowCondition(productId); // Set the productId to show the condition for that product
+  };
+
+  // Function to close condition information
+  const handleCloseCondition = () => {
+    setShowCondition(null); // Reset the showCondition state to hide condition information
+  };
 
   return (
     <div>
-      <Header headName="SignOut" cartCount={cartItems.length} toggleCart={toggleCart} /> {/* Pass toggleCart function */}
+      <Header
+        headName="SignOut"
+        cartCount={cartItems.length}
+        toggleCart={toggleCart}
+        onCategoryChange={handleCategoryChange} // Pass handleCategoryChange function to handle category change
+        onArtistChange={handleArtistChange} // Pass handleArtistChange function to handle artist change
+      />
       <div className="body-page">
         <div className="product-grid">
           {products.map(product => (
-            <div key={product.id} className="product-card">
-              <img src={product.imageUrl} alt={product.name} className="product-image" />
+            <div key={product._id} className="product-card"> {/* Assuming _id is unique */}
+              <img
+                src={product.ArtImages}
+                alt={product.Artist}
+                className="product-image"
+                style={{ width: '200px', height: '200px' }} // Set fixed dimensions for images
+                onClick={() => handleImageClick(product._id)} // Handle click on image
+              />
               <div className="product-info">
-                <div className="product-name">{product.name}</div>
-                <div className="product-price">{product.price}</div>
-                <button className="add-to-cart-button" onClick={() => addToCart(product)}>
+                <div className="product-name">{product.Artist}</div>
+                <div className="product-price">{product.Price}</div>
+                {/* Show condition information if showCondition state matches product _id */}
+                {showCondition === product._id && (
+                  <div className="product-condition">
+                    <h3>Condition:</h3>
+                    <p>{product.Condition}</p>
+                    <button onClick={handleCloseCondition} style={{background:"#ff9900",color:"white"}}>Close</button>
+                  </div>
+                )}
+                <button style={{marginTop:"10px"}}className="add-to-cart-button" onClick={() => addToCart(product)}>
                   Add to Cart
                 </button>
               </div>

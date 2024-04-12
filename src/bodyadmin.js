@@ -1,163 +1,629 @@
-import React, { useState } from 'react';
+// import React, { useState, useEffect } from 'react';
+// import './BodyPage.css';
+// import Header from './header/header';
+// import CheckoutPage from './checkoutpage/checkoutpage';
+// import EditIcon from '@mui/icons-material/Edit';
+// import DeleteIcon from '@mui/icons-material/Delete'; // Import the delete icon
+
+// const BodyPage1 = () => {
+//   const [cartItems, setCartItems] = useState([]);
+//   const [isCartOpen, setIsCartOpen] = useState(false);
+//   const [selectedCategory, setSelectedCategory] = useState('');
+//   const [selectedArtist, setSelectedArtist] = useState('');
+//   const [products, setProducts] = useState([]);
+//   const [showCondition, setShowCondition] = useState(null);
+//   const [editProductId, setEditProductId] = useState(null);
+//   const [editPrice, setEditPrice] = useState('');
+//   const [editCondition, setEditCondition] = useState('');
+
+//   useEffect(() => {
+//     if (selectedCategory) {
+//       fetchProducts(selectedCategory);
+//     }
+//   }, [selectedCategory]);
+
+//   const fetchProducts = async (category) => {
+//     try {
+//       const response = await fetch(`http://127.0.0.1:8000/search_by_category?category=${category}`);
+//       if (!response.ok) {
+//         throw new Error('Failed to fetch products');
+//       }
+//       const data = await response.json();
+//       const artworksArray = Object.values(data.artworks);
+//       setProducts(artworksArray);
+//     } catch (error) {
+//       console.error('Error fetching products:', error.message);
+//     }
+//   };
+
+//   const handleCategoryChange = (category) => {
+//     setSelectedCategory(category);
+//   };
+
+//   const handleArtistChange = async (artist) => {
+//     try {
+//       const response = await fetch(`http://127.0.0.1:8000/search_by_artist?artist=${artist}`);
+//       if (!response.ok) {
+//         throw new Error('Failed to fetch products');
+//       }
+//       const data = await response.json();
+//       const artworksArray = Object.values(data.artworks);
+//       setProducts(artworksArray);
+//     } catch (error) {
+//       console.error('Error fetching products:', error.message);
+//     }
+//   };
+
+//   const addToCart = (product) => {
+//     const existingItem = cartItems.find((item) => item._id === product._id);
+
+//     if (existingItem) {
+//       const updatedCartItems = cartItems.map((item) =>
+//         item._id === product._id ? { ...item, quantity: item.quantity + 1 } : item
+//       );
+//       setCartItems(updatedCartItems);
+//     } else {
+//       setCartItems([...cartItems, { ...product, quantity: 1 }]);
+//     }
+//   };
+
+//   const toggleCart = () => {
+//     setIsCartOpen((prevState) => !prevState);
+//   };
+
+//   const handleImageClick = (productId) => {
+//     setShowCondition(productId);
+//   };
+
+//   const handleCloseCondition = () => {
+//     setShowCondition(null);
+//   };
+
+//   const handleEditClick = (productId, initialPrice, initialCondition) => {
+//     setEditProductId(productId);
+//     setEditPrice(initialPrice);
+//     setEditCondition(initialCondition);
+//   };
+
+//   const handleEditCancel = () => {
+//     setEditProductId(null);
+//     setEditPrice('');
+//     setEditCondition('');
+//   };
+
+//   const handleEditSubmit = async () => {
+//     try {
+//       const response = await fetch('http://127.0.0.1:8000/update_artwork', {
+//         method: 'PUT',
+//         headers: {
+//           'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({
+//           art_id: editProductId,
+//           new_price: editPrice,
+//           new_condition: editCondition
+//         })
+//       });
+  
+//       if (!response.ok) {
+//         throw new Error('Failed to update artwork');
+//       }
+  
+//       // Update the products array with the edited data
+//       const updatedProducts = products.map(product => {
+//         if (product.ArtID === editProductId) {
+//           return {
+//             ...product,
+//             Price: editPrice, // Update the price
+//             Condition: editCondition // Update the condition
+//           };
+//         }
+//         return product;
+//       });
+  
+//       setProducts(updatedProducts);
+  
+//       const data = await response.json();
+//       console.log(data); // Logging the response from the server
+//       setEditProductId(null);
+//       setEditPrice('');
+//       setEditCondition('');
+//     } catch (error) {
+//       console.error('Error updating artwork:', error.message);
+//     }
+//   };
+
+//   const handleDeleteProduct = async (productId) => {
+//     try {
+//       const response = await fetch(`http://127.0.0.1:8000/delete_artwork?art_id=${productId}`, {
+//         method: 'DELETE'
+//       });
+  
+//       if (!response.ok) {
+//         throw new Error('Failed to delete product');
+//       }
+  
+//       const data = await response.json();
+//       console.log(data.message); // Log the response message from the server
+  
+//       // Filter out the deleted product from the products array
+//       const updatedProducts = products.filter(product => product.ArtID !== productId);
+//       setProducts(updatedProducts);
+//     } catch (error) {
+//       console.error('Error deleting product:', error.message);
+//     }
+//   };
+  
+
+//   return (
+//     <div>
+//       <Header
+//         headName="SignOut"
+//         cartCount={cartItems.length}
+//         toggleCart={toggleCart}
+//         onCategoryChange={handleCategoryChange}
+//         onArtistChange={handleArtistChange}
+//       />
+//       <div className="body-page">
+//         <div className="product-grid">
+//           {products.map((product) => (
+//             <div key={product._id} className="product-card">
+//               <img
+//                 src={product.ArtImages}
+//                 alt={product.Artist}
+//                 className="product-image"
+//                 style={{ width: '200px', height: '200px' }}
+//                 onClick={() => handleImageClick(product._id)}
+//               />
+//               <div className="product-info">
+//                 <div className="product-name">{product.Artist}</div>
+//                 <div className="product-price">{product.Price}</div>
+//                 {showCondition === product._id && (
+//                   <div className="product-condition">
+//                     <h3>Condition:</h3>
+//                     <p>{product.Condition}</p>
+//                     <button onClick={handleCloseCondition} style={{ background: '#ff9900', color: 'white' }}>
+//                       Close
+//                     </button>
+//                   </div>
+//                 )}
+//                 {editProductId === product.ArtID ? (
+//                   <div>
+//                     <input
+//                       type="text"
+//                       value={editPrice}
+//                       onChange={(e) => setEditPrice(e.target.value)}
+//                       placeholder="Enter new price"
+//                     />
+//                     <input
+//                       type="text"
+//                       value={editCondition}
+//                       onChange={(e) => setEditCondition(e.target.value)}
+//                       placeholder="Enter new condition"
+//                     />
+//                     <button onClick={handleEditSubmit}>Submit</button>
+//                     <button onClick={handleEditCancel}>Cancel</button>
+//                   </div>
+//                 ) : (
+//                   <>
+//                     <EditIcon
+//                       style={{ marginRight: '10px', cursor: 'pointer', color: '#ff9900' }}
+//                       onClick={() => handleEditClick(product.ArtID, product.Price, product.Condition)}
+//                     />
+//                     <DeleteIcon
+//                       style={{ cursor: 'pointer', color: '#ff9900' }}
+//                       onClick={() => handleDeleteProduct(product.ArtID)}
+//                     />
+//                   </>
+//                 )}
+//                 <button
+//                   style={{ marginTop: '10px' }}
+//                   className="add-to-cart-button"
+//                   onClick={() => addToCart(product)}
+//                 >
+//                   Add to Cart
+//                 </button>
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+//       {isCartOpen && <CheckoutPage cartItems={cartItems} />}
+//     </div>
+//   );
+// };
+
+// export default BodyPage1;
+
+
+import React, { useState, useEffect } from 'react';
 import './BodyPage.css';
 import Header from './header/header';
 import CheckoutPage from './checkoutpage/checkoutpage';
-import DeleteIcon from '@material-ui/icons/Delete';
-import EditIcon from '@material-ui/icons/Edit';
-import AddIcon from '@material-ui/icons/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete'; // Import the delete icon
+import AddIcon from '@mui/icons-material/Add'; // Import the add icon
 
 const BodyPage1 = () => {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [products, setProducts] = useState([
-    { id: 1, name: 'Product 1', price: '$10', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 2, name: 'Product 2', price: '$20', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 3, name: 'Product 3', price: '$30', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 4, name: 'Product 4', price: '$40', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 5, name: 'Product 5', price: '$50', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 6, name: 'Product 6', price: '$60', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 7, name: 'Product 7', price: '$70', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 8, name: 'Product 8', price: '$80', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 9, name: 'Product 9', price: '$90', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 10, name: 'Product 10', price: '$100', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 11, name: 'Product 10', price: '$100', imageUrl: 'https://via.placeholder.com/150' },
-    { id: 12, name: 'Product 10', price: '$100', imageUrl: 'https://via.placeholder.com/150' },
-  ]);
-  const [isAddProductFormOpen, setIsAddProductFormOpen] = useState(false);
-  const [newProduct, setNewProduct] = useState({ name: '', price: '', imageUrl: '' });
-  const [editableProductId, setEditableProductId] = useState(null); // State to track which product is being edited
-  const [editedProduct, setEditedProduct] = useState({ name: '', price: '', imageUrl: '' });
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedArtist, setSelectedArtist] = useState('');
+  const [products, setProducts] = useState([]);
+  const [showCondition, setShowCondition] = useState(null);
+  const [editProductId, setEditProductId] = useState(null);
+  const [editPrice, setEditPrice] = useState('');
+  const [editCondition, setEditCondition] = useState('');
+  const [showForm, setShowForm] = useState(false); // State to control the visibility of the form
+  const [formData, setFormData] = useState({
+    artist: '',
+    art_id: '',
+    art_images: '',
+    price: '',
+    location: '',
+    title: '',
+    creation_year: '',
+    signed: '',
+    condition: '',
+    category: '',
+    movement: ''
+  });
+
+  useEffect(() => {
+    if (selectedCategory) {
+      fetchProducts(selectedCategory);
+    }
+  }, [selectedCategory]);
+
+  const fetchProducts = async (category) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/search_by_category?category=${category}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+      const data = await response.json();
+      const artworksArray = Object.values(data.artworks);
+      setProducts(artworksArray);
+    } catch (error) {
+      console.error('Error fetching products:', error.message);
+    }
+  };
+
+  const handleCategoryChange = (category) => {
+    setSelectedCategory(category);
+  };
+
+  const handleArtistChange = async (artist) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/search_by_artist?artist=${artist}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+      const data = await response.json();
+      const artworksArray = Object.values(data.artworks);
+      setProducts(artworksArray);
+    } catch (error) {
+      console.error('Error fetching products:', error.message);
+    }
+  };
 
   const addToCart = (product) => {
-    const existingItemIndex = cartItems.findIndex(item => item.id === product.id);
-  
-    if (existingItemIndex !== -1) {
-      const updatedCartItems = cartItems.map((item, index) => {
-        if (index === existingItemIndex) {
-          return { ...item, quantity: item.quantity + 1 };
-        }
-        return item;
-      });
-  
+    const existingItem = cartItems.find((item) => item._id === product._id);
+
+    if (existingItem) {
+      const updatedCartItems = cartItems.map((item) =>
+        item._id === product._id ? { ...item, quantity: item.quantity + 1 } : item
+      );
       setCartItems(updatedCartItems);
     } else {
       setCartItems([...cartItems, { ...product, quantity: 1 }]);
     }
   };
 
-  const removeFromCart = (productId) => {
-    const updatedCartItems = cartItems.filter(item => item.id !== productId);
-    setCartItems(updatedCartItems);
-  };
-
-  const updateCartItem = (productId, newQuantity) => {
-    const updatedCartItems = cartItems.map(item => {
-      if (item.id === productId) {
-        return { ...item, quantity: newQuantity };
-      }
-      return item;
-    });
-    setCartItems(updatedCartItems);
-  };
-
   const toggleCart = () => {
-    setIsCartOpen(prevState => !prevState);
+    setIsCartOpen((prevState) => !prevState);
   };
 
-  const addProduct = () => {
-    setProducts([...products, { ...newProduct, id: products.length + 1 }]);
-    setIsAddProductFormOpen(false);
-    setNewProduct({ Art_ID:' ',name: '', price: '', imageUrl: '' });
+  const handleImageClick = (productId) => {
+    setShowCondition(productId);
   };
 
-  const deleteProduct = (productId) => {
-    const updatedProducts = products.filter(product => product.id !== productId);
-    setProducts(updatedProducts);
+  const handleCloseCondition = () => {
+    setShowCondition(null);
   };
 
-  const handleEditProduct = (productId) => {
-    setEditableProductId(productId);
-    const productToEdit = products.find(product => product.id === productId);
-    setEditedProduct({ ...productToEdit });
+  const handleEditClick = (productId, initialPrice, initialCondition) => {
+    setEditProductId(productId);
+    setEditPrice(initialPrice);
+    setEditCondition(initialCondition);
   };
 
-  const submitEditedProduct = () => {
-    const updatedProducts = products.map(product => {
-      if (product.id === editableProductId) {
-        return { ...editedProduct };
+  const handleEditCancel = () => {
+    setEditProductId(null);
+    setEditPrice('');
+    setEditCondition('');
+  };
+
+  const handleEditSubmit = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/update_artwork', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          art_id: editProductId,
+          new_price: editPrice,
+          new_condition: editCondition
+        })
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update artwork');
       }
-      return product;
-    });
-    setProducts(updatedProducts);
-    setEditableProductId(null); // Reset editableProductId after updating the product
+  
+      // Update the products array with the edited data
+      const updatedProducts = products.map(product => {
+        if (product.ArtID === editProductId) {
+          return {
+            ...product,
+            Price: editPrice, // Update the price
+            Condition: editCondition // Update the condition
+          };
+        }
+        return product;
+      });
+  
+      setProducts(updatedProducts);
+  
+      const data = await response.json();
+      console.log(data); // Logging the response from the server
+      setEditProductId(null);
+      setEditPrice('');
+      setEditCondition('');
+    } catch (error) {
+      console.error('Error updating artwork:', error.message);
+    }
   };
+
+  const handleDeleteProduct = async (productId) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/delete_artwork?art_id=${productId}`, {
+        method: 'DELETE'
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to delete product');
+      }
+  
+      const data = await response.json();
+      console.log(data.message); // Log the response message from the server
+  
+      // Filter out the deleted product from the products array
+      const updatedProducts = products.filter(product => product.ArtID !== productId);
+      setProducts(updatedProducts);
+    } catch (error) {
+      console.error('Error deleting product:', error.message);
+    }
+  };
+
+  const handleInsertDocument = () => {
+    // Show the form when the add icon is clicked
+    setShowForm(true);
+  };
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault(); // Prevent default form submission
+    
+    try {
+      const response = await fetch('http://127.0.0.1:8000/insert_document', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData), // Use formData from state
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to insert document');
+      }
+  
+      const data = await response.json();
+      console.log(data); // Log the response from the server
+  
+      // Optionally, reset the form data and hide the form after successful submission
+      setFormData({
+        artist: '',
+        art_id: '',
+        art_images: '',
+        price: '',
+        location: '',
+        title: '',
+        creation_year: '',
+        signed: '',
+        condition: '',
+        category: '',
+        movement: ''
+      });
+      setShowForm(false);
+    } catch (error) {
+      console.error('Error inserting document:', error.message);
+    }
+  };
+  
+  
 
   return (
     <div>
-      <Header headName="SignOut" cartCount={cartItems.length} toggleCart={toggleCart} />
+      <Header
+        headName="SignOut"
+        cartCount={cartItems.length}
+        toggleCart={toggleCart}
+        onCategoryChange={handleCategoryChange}
+        onArtistChange={handleArtistChange}
+      />
       <div className="body-page">
         <div className="product-grid">
-          {/* Plus icon to toggle add product form */}
-          <div onClick={() => setIsAddProductFormOpen(true)}>
-            <AddIcon />
-            <span>Add Product</span>
-          </div>
-
-          {/* Add product form */}
-          {isAddProductFormOpen && (
-            <div className="add-product-modal">
-              <div className="add-product-modal-content">
-                <span className="add-product-modal-close" onClick={() => setIsAddProductFormOpen(false)}>&times;</span>
-                <h2>Add Product</h2>
-                <form onSubmit={addProduct}>
-                <input type="text" value={newProduct.Art_ID} onChange={(e) => setNewProduct({ ...newProduct, Art_ID: e.target.value })} placeholder="Artist ID" required />
-                  <input type="text" value={newProduct.name} onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })} placeholder="Product Name" required />
-                  <input type="text" value={newProduct.price} onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })} placeholder="Price" required />
-                  <input type="text" value={newProduct.imageUrl} onChange={(e) => setNewProduct({ ...newProduct, imageUrl: e.target.value })} placeholder="Image URL" required />
-                  <button type="submit">Add Product</button>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* Display existing products */}
-          {products.map(product => (
-            <div key={product.id} className="product-card">
-              <img src={product.imageUrl} alt={product.name} className="product-image" />
+          {products.map((product) => (
+            <div key={product._id} className="product-card">
+              <img
+                src={product.ArtImages}
+                alt={product.Artist}
+                className="product-image"
+                style={{ width: '200px', height: '200px' }}
+                onClick={() => handleImageClick(product._id)}
+              />
               <div className="product-info">
-                {/* Editable fields */}
-                {editableProductId === product.id ? (
-                  <div>
-                    <input type="text" value={editedProduct.name} onChange={(e) => setEditedProduct({ ...editedProduct, name: e.target.value })} />
-                    <input type="text" value={editedProduct.price} onChange={(e) => setEditedProduct({ ...editedProduct, price: e.target.value })} />
-                    <input type="text" value={editedProduct.imageUrl} onChange={(e) => setEditedProduct({ ...editedProduct, imageUrl: e.target.value })} />
-                    <button onClick={submitEditedProduct}>Submit</button>
-                  </div>
-                ) : (
-                  <div>
-                    <div className="product-name">{product.name}</div>
-                    <div className="product-price">{product.price}</div>
+                <div className="product-name">{product.Artist}</div>
+                <div className="product-price">{product.Price}</div>
+                {showCondition === product._id && (
+                  <div className="product-condition">
+                    <h3>Condition:</h3>
+                    <p>{product.Condition}</p>
+                    <button onClick={handleCloseCondition} style={{ background: '#ff9900', color: 'white' }}>
+                      Close
+                    </button>
                   </div>
                 )}
-                <button className="add-to-cart-button" onClick={() => addToCart(product)}>
-                  <AddIcon /> Add to Cart
+                {editProductId === product.ArtID ? (
+                  <div>
+                    <input
+                      type="text"
+                      value={editPrice}
+                      onChange={(e) => setEditPrice(e.target.value)}
+                      placeholder="Enter new price"
+                    />
+                    <input
+                      type="text"
+                      value={editCondition}
+                      onChange={(e) => setEditCondition(e.target.value)}
+                      placeholder="Enter new condition"
+                    />
+                    <button onClick={handleEditSubmit}>Submit</button>
+                    <button onClick={handleEditCancel}>Cancel</button>
+                  </div>
+                ) : (
+                  <>
+                    <EditIcon
+                      style={{ marginRight: '10px', cursor: 'pointer', color: '#ff9900' }}
+                      onClick={() => handleEditClick(product.ArtID, product.Price, product.Condition)}
+                    />
+                    <DeleteIcon
+                      style={{ cursor: 'pointer', color: '#ff9900' }}
+                      onClick={() => handleDeleteProduct(product.ArtID)}
+                    />
+                  </>
+                )}
+                <button
+                  style={{ marginTop: '10px' }}
+                  className="add-to-cart-button"
+                  onClick={() => addToCart(product)}
+                >
+                  Add to Cart
                 </button>
-                {/* Admin functionalities */}
-                <DeleteIcon onClick={() => deleteProduct(product.id)} />
-                <EditIcon onClick={() => handleEditProduct(product.id)} />
               </div>
             </div>
           ))}
+          {showForm ? (
+            <div className="product-card">
+              {/* Your form component goes here */}
+              <form onSubmit={handleFormSubmit}>
+                <input
+                  type="text"
+                  name="artist"
+                  value={formData.artist}
+                  onChange={handleFormChange}
+                  placeholder="Artist"
+                />
+                <input
+                  type="text"
+                  name="art_id"
+                  value={formData.art_id}
+                  onChange={handleFormChange}
+                  placeholder="Art ID"
+                />
+                <input
+                  type="text"
+                  name="art_images"
+                  value={formData.art_images}
+                  onChange={handleFormChange}
+                  placeholder="Art Images"
+                />
+                <input
+                  type="text"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleFormChange}
+                  placeholder="Price"
+                />
+                <input
+                  type="text"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleFormChange}
+                  placeholder="Location"
+                />
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleFormChange}
+                  placeholder="Title"
+                />
+                <input
+                  type="text"
+                  name="creation_year"
+                  value={formData.creation_year}
+                  onChange={handleFormChange}
+                  placeholder="Creation Year"
+                />
+                <input
+                  type="text"
+                  name="signed"
+                  value={formData.signed}
+                  onChange={handleFormChange}
+                  placeholder="Signed"
+                />
+                <input
+                  type="text"
+                  name="condition"
+                  value={formData.condition}
+                  onChange={handleFormChange}
+                  placeholder="Condition"
+                />
+                <input
+                  type="text"
+                  name="category"
+                  value={formData.category}
+                  onChange={handleFormChange}
+                  placeholder="Category"
+                />
+                <input
+                  type="text"
+                  name="movement"
+                  value={formData.movement}
+                  onChange={handleFormChange}
+                  placeholder="Movement"
+                />
+                <button type="submit">Submit</button>
+              </form>
+            </div>
+          ) : (
+            <div className="product-card" onClick={handleInsertDocument}>
+              <AddIcon style={{ width: '100px', height: '100px', cursor: 'pointer' }} />
+            </div>
+          )}
         </div>
       </div>
-      {/* Conditionally render CheckoutPage based on isCartOpen */}
-      {isCartOpen && (
-        <CheckoutPage
-          cartItems={cartItems}
-          removeFromCart={removeFromCart}
-          updateCartItem={updateCartItem}
-        />
-      )}
+      {isCartOpen && <CheckoutPage cartItems={cartItems} />}
     </div>
   );
 };
