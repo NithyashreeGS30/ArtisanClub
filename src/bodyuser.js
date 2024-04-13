@@ -106,7 +106,8 @@ const BodyPage = () => {
                 onClick={() => handleImageClick(product._id)} // Handle click on image
               />
               <div className="product-info">
-                <div className="product-name">{product.Artist}</div>
+              <div className="product-name" style={{fontWeight:"bold"}}>{product.Title}</div>
+                <div className="product-title">{product.Artist}</div>
                 <div className="product-price">{product.Price}</div>
                 {/* Show condition information if showCondition state matches product _id */}
                 {showCondition === product._id && (
